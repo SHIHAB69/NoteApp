@@ -1,4 +1,9 @@
+// ignore_for_file: avoid_unnecessary_containers, file_names
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flut_test/views/LoginScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
 import 'package:lottie/lottie.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -9,6 +14,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  TextEditingController forgetPasswordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +43,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextFormField(
+                  controller: forgetPasswordController,
                   decoration: const InputDecoration(
                     suffixIcon: Icon(Icons.email),
                     hintText: 'Enter your Email',
@@ -48,7 +55,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 height: 10,
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  var forgotEmail = forgetPasswordController.text.trim();
+                  try{
+                   await FirebaseAuth.instance.sendPasswordResetEmail(email: forgotEmail).
+                    then((value) => {
+                      print("Email sent!"),
+                     Get.off(()=>LoginScreen()),
+
+                    });
+                  }on FirebaseAuthException catch(e){
+                    print("Error $e");
+                  }
+                },
                 child: const Text("Forgot Password"),
               ),
             ],

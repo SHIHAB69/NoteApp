@@ -1,11 +1,17 @@
 
+// ignore_for_file: avoid_unnecessary_containers, file_names, duplicate_ignore
+
 import 'dart:developer';
 
+// ignore: unused_import
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flut_test/views/signInScreen.dart';
+import 'package:flut_test/views/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:lottie/lottie.dart';
+
+import '../services/signUpServices.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -19,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController userPhoneController = TextEditingController();
   TextEditingController userEmailController = TextEditingController();
   TextEditingController userPasswordController = TextEditingController();
+  User ? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -96,17 +103,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 10,
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   var userName = userNameController.text.trim();
                   var userPhone = userPhoneController.text.trim();
                   var userEmail = userEmailController.text.trim();
                   var userPassword = userPasswordController.text.trim();
 
-                  FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
+                  await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword (
                           email: userEmail, password: userPassword)
                       .then((value) => {
                        log("user Created"),
+                        signUpUser(userName,userPhone,userEmail,userPassword),
                           });
                 },
                 child: const Text("SignUp"),
@@ -117,9 +125,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               GestureDetector(
                 onTap: () {
                   Get.to(
-                    () => const SignInScreen(),
+                    () => const LoginScreen(),
                   );
                 },
+                // ignore: avoid_unnecessary_containers
                 child: Container(
                   child: const Card(
                     child: Padding(
